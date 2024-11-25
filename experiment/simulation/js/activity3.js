@@ -3,9 +3,9 @@ var obt1_first_value_verfied = false;
 var flow_rate_text = document.createElement('div');
 // var button = `<button class="offcanvasbtn"  type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight1" aria-controls="offcanvasRight1"><i class="bi bi-gear offcanvasicon"></i></button>`;
 var ob_btn = `<button id="panel1_btn" class="btn btn-primary" onclick="complete_obtab_1();" style="
-position: absolute; bottom: 12vh; width: 90%;"> Display Observation Table</button>`;
+position: absolute; bottom: 12vh; width: 90%;"> Display Observation Table for 200 cm<sup>3</sup>/min</button>`;
 var ob_btn_fr2 = `<button id="panel1_btn" class="btn btn-primary" onclick="complete_obtab_2();" style="
-position: absolute; bottom: 12vh; width: 90%;"> Display Observation Table</button>`;
+position: absolute; bottom: 12vh; width: 90%;"> Display Observation Table for 400 cm<sup>3</sup>/min</button>`;
 var move_to_act4 = `<button id="panel1_btn" class="btn btn-primary" onclick="activity4();" style="
 position: absolute; bottom: 12vh; width: 90%;">Start Calculations</button>`;
 // pp.addtoleftpannel(table);
@@ -17,13 +17,13 @@ function activity3() {
     pp.clearleftpannel();
     //   pp.addtoleftpannel(button);
     pp.showdescription('<p style="background-color: #f4ccccff; border-radius: 10px; border: black; padding: 5%; font-weight: 500; font-size: 2.5vw;">Fill in the all noted values in table and click verify. <br> 2 points for each correct value</p>', 3);
-    pp.showtitle("Complete the Observation Table", 3);
+    pp.showtitle(`<p id="exp-title">Complete the Observation Table</p>`, 3);
     pp.showscore("100", 3);
     var obtable = `
 
 <br>
-
-<table class="table" style="height: 70vw; font-size: calc(0.7vw + 9px);">
+<div class='table-responsive' style='height: 40vw; overflow: auto;'>
+<table class="table" style=" font-size: calc(0.7vw + 9px);">
     <thead>
       <tr id="obtab-head">
         <th scope="col">Obs No.</th>
@@ -50,6 +50,8 @@ function activity3() {
      
     </tbody>
   </table>
+
+  </div>
 
 `;
     flow_rate_text.innerHTML = `
@@ -123,6 +125,7 @@ function complete_obtab_1() {
       `;
         table_body.append(row);
     }
+    pp.showdescription('<p style="background-color: #f4ccccff; border-radius: 10px; border: black; padding: 5%; font-weight: 500; font-size: calc(0.8vw + 8px);">Show the full Table with flow rate = 400 cm<sup>3</sup>/min</p>', 3);
     pp.addtorightpannel(ob_btn_fr2, 3);
 }
 function complete_obtab_2() {
@@ -151,4 +154,5 @@ function complete_obtab_2() {
     pp.showdescription('<p style="background-color: #f4ccccff; border-radius: 10px; border: black; padding: 5%; font-weight: 500; font-size: calc(0.8vw + 8px);">Let\'s start with calculations.</p>', 3);
     pp.addtorightpannel(move_to_act4, 3);
 }
+//activity3();
 //# sourceMappingURL=activity3.js.map
