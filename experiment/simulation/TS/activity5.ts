@@ -1,18 +1,37 @@
+
 var verify_summations_btn_2 = `<button id="panel1_btn" class="btn btn-primary" onclick="verify_summations_2();" style="position: absolute; bottom: 3vh; width: 90%;"> Verify</button>`;
+
+
 function complete_main_table_2() {
+
+
     document.getElementById('hide_panel3').click();
+
     pp.clearleftpannel();
+
     pp.clearrightpannel();
+    
     pp.addoffcanvas(3);
+
     pp.showtitle(`<p id="exp-title">Repeat Calculations for flow rate  = 400 cm<sup>3</sup>/min</p>`, 3);
+
     pp.addtoleftpannel(main_table);
+
     let tb = document.getElementById('table-5-body');
-    tb.innerHTML = ``;
+
+    tb.innerHTML= ``;
+
+
     document.getElementById('a5-temp').remove();
-    for (let i = 0; i < 20; i++) {
+      
+    for(let i=0; i<20; i++) {
+
         let row = document.createElement('tr');
+
+
+
         row.innerHTML = `
-        <td>${i + 1}</td>
+        <td>${i+1}</td>
         <td>${obt_2_data[i][0]}</td>
         <td>${obt_2_data[i][1]}</td>
         <td>${obt_2_data[i][2].toFixed(2)}</td>
@@ -23,10 +42,17 @@ function complete_main_table_2() {
         <td>${(obt_2_data[i][7].toFixed(6))}</td>
         <td>${(obt_2_data[i][8]).toFixed(2)}</td>
         `;
+
+
         tb.append(row);
+
+
     }
+
     console.log('table loaded sccessfully!');
-    let all_properties = `
+
+
+    let  all_properties = `
 
 <div style="overflow-y: auto !important; max-height: 80%;">
 <table class="table" style="height: 30% !important;">
@@ -95,37 +121,60 @@ function complete_main_table_2() {
 
 
 `;
-    pp.showdescription(all_properties, 3);
-    pp.addtorightpannel(verify_summations_btn_2, 3);
+
+pp.showdescription(all_properties, 3);
+
+
+pp.addtorightpannel(verify_summations_btn_2, 3);
+
+ 
     // document.getElementById('panel1_btn').remove();
+
     // pp.addtorightpannel(act5_plot_btn, 3);
+
 }
+
+
+
 function verify_summations_2() {
     // let val1: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp1");
     // let val2: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp2");
     // let val3: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp3");
-    let val4 = document.getElementById("act4-tab3-inp4");
-    let val5 = document.getElementById("act4-tab3-inp5");
-    let val6 = document.getElementById("act4-tab3-inp6");
+    let val4: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp4");
+    let val5: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp5");
+    let val6: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp6");
+
     // console.log(parseFloat(val1.value));
+
     // console.log(Q.value, To.value, Ti.value, ti.value, to.value);
     console.log(`Mean Residence value ${t_bar_2}`);
     console.log(`Varience value ${sigma_2}`);
     console.log(`dispersion value ${root_2}`);
+
     if (!verify_values(parseFloat(val4.value), t_bar_2)) {
         alert("please correct the Mean Residence value");
         return;
     }
+
     if (!verify_values(parseFloat(val5.value), sigma_2)) {
         alert("please correct the Varience value");
         return;
-    }
+        }
+
     if (!verify_values(parseFloat(val6.value), root_2)) {
-        alert("please correct the dispersion value value");
-        return;
+    alert("please correct the dispersion value value");
+    return;
     }
+
+
     // pp.addtorightpannel(act5_ob_btn, 3);
+
     alert('all values entered are correct');
+
+
+
     activity6();
+
 }
-//# sourceMappingURL=activity5.js.map
+
+

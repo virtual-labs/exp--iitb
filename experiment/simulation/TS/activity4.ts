@@ -2,25 +2,30 @@ var sum_c1_delta_t_1 = 0;
 var sum_c1_delta_t_2 = 0;
 var sum_ci_ti_delta_t_1 = 0;
 var sum_ci_ti_delta_t_2 = 0;
-var tau_1;
-var tau_2;
+var tau_1: number;
+var tau_2:number;
 var vol_of_reactor = 1470;
 var void_vol_of_reactor = 1102;
 var void_fraction = 0.75;
 var sum_ci_ti_ti_delta_t_1 = 0;
 var sum_ci_ti_ti_delta_t_2 = 0;
 var main_table = ``;
-var t_bar_1;
-var t_bar_2;
-var sigma_1;
-var sigma_2;
-var root_1;
-var root_2;
-var first_row_verified = false;
+var t_bar_1: number;
+var t_bar_2: number;
+var sigma_1: number;
+var sigma_2: number;
+var root_1: number;
+var root_2: number;
+
+var first_row_verified: boolean = false;
+
 var act4_btn_1 = `<button id="panel1_btn" class="btn btn-primary" onclick="complete_main_table_1();" style="
 position: absolute; bottom: 12vh; width: 90%;"> Display Observation Table</button>`;
+
 var verify_summations_btn = `<button id="panel1_btn" class="btn btn-primary" onclick="verify_summations();" style="position: absolute; bottom: 3vh; width: 90%;"> Verify</button>`;
+
 var move_to_act5 = `<button id="panel1_btn" class="btn btn-primary" onclick="complete_main_table_2();" style="position: absolute; bottom: 3vh; width: 90%;"> Verify</button>`;
+
 function activity4() {
     tau_1 = (void_vol_of_reactor * 60) / flow_rate_1;
     obt_1_data = add_readings(obt_1_data, tau_1);
@@ -31,6 +36,9 @@ function activity4() {
     console.log(tau_2);
     calculate_sum_val_tab1();
     calculate_sum_val_tab2();
+
+
+
     main_table = `
     <div id="act5-main-table" style="height:100%" class="table-responsive">
 <table  class="table" >
@@ -85,8 +93,12 @@ function activity4() {
     </div>
     
     `;
+
+
     pp.clearleftpannel();
     pp.addtoleftpannel(main_table);
+
+
     let formula = `
     <p>Void Volume of Reactor, V (cm<sup>3</sup>) = 1102</p>
     <p>Volumetric Flow rate, v(cm<sup>3</sup>/min)</p>
@@ -97,82 +109,107 @@ function activity4() {
     <p>E<sub>LFR</sub> = 0 &nbsp; if t &lt; &tau;/2</p>
     <p>E<sub>LFR</sub> = &tau;/2t<sup>2</sup> &nbsp; if t &ge; &tau;/2</p>
     `;
-    if (document.getElementById('panel1_btn')) {
+
+
+    if(document.getElementById('panel1_btn')) {
         document.getElementById('panel1_btn').remove();
     }
+
     pp.showdescription(formula, 3);
+
+
+
 }
-function add_readings(table, tau) {
+
+
+
+function add_readings(table: number[][], tau: number): number[][] {
+
     sum_c1_delta_t_1 = 0;
     sum_ci_ti_delta_t_1 = 0;
     sum_ci_ti_ti_delta_t_1 = 0;
-    for (let i = 0; i < table.length; i++) {
+    for(let i=0; i<table.length; i++) {
         table[i][2] = 0.64 * (table[i][1] - table[0][1]);
-        if (i < (table.length - 1)) {
-            table[i + 1][3] = table[i + 1][0] - table[i][0];
+        if(i < (table.length -1)) {
+            table[i+1][3] = table[i+1][0] - table[i][0];
         }
-        if (i == 0) {
+        
+        if(i == 0) {
             table[i][3] = 0;
         }
+
         table[i][4] = table[i][3] * table[i][2];
         sum_c1_delta_t_1 += table[i][4];
         table[i][5] = table[i][0] * table[i][2] * table[i][3];
         sum_ci_ti_delta_t_1 += table[i][5];
+
+
     }
-    for (let i = 0; i < table.length; i++) {
+
+    for(let i=0; i<table.length; i++) {
         table[i][6] = table[i][2] / sum_c1_delta_t_1;
-        if (table[i][0] < tau / 2) {
+        if(table[i][0] < tau/2) {
             table[i][7] = 0;
-        }
-        else {
-            table[i][7] = (Math.pow(tau, 2)) / (2 * (Math.pow(table[i][0], 3)));
+        } else {
+            table[i][7] = (tau**2) / (2 * (table[i][0]**3));
         }
         table[i][8] = table[i][5] * table[i][0];
         sum_ci_ti_ti_delta_t_1 += table[i][8];
     }
     return table;
 }
+
 function calculate_sum_val_tab1() {
     sum_c1_delta_t_1 = 0;
     sum_ci_ti_delta_t_1 = 0;
     sum_ci_ti_ti_delta_t_1 = 0;
-    for (let i = 0; i < obt_1_data.length; i++) {
+
+    for(let i=0; i<obt_1_data.length; i++) {
         sum_c1_delta_t_1 += obt_1_data[i][4];
         sum_ci_ti_delta_t_1 += obt_1_data[i][5];
         sum_ci_ti_ti_delta_t_1 += obt_1_data[i][8];
     }
     t_bar_1 = sum_ci_ti_delta_t_1 / sum_c1_delta_t_1;
-    sigma_1 = (sum_ci_ti_ti_delta_t_1 / sum_c1_delta_t_1) - (Math.pow(t_bar_1, 2));
-    c = sigma_1 / Math.pow(t_bar_1, 2);
+    sigma_1 = (sum_ci_ti_ti_delta_t_1 / sum_c1_delta_t_1) - (t_bar_1**2);
+    c = sigma_1 / t_bar_1**2;
     root_1 = newton_raphson(a, b, c);
-    let display_arr = [sum_c1_delta_t_1, sum_ci_ti_delta_t_1, sum_ci_ti_ti_delta_t_1, t_bar_1, sigma_1, root_1];
+
+    let display_arr = [sum_c1_delta_t_1,  sum_ci_ti_delta_t_1, sum_ci_ti_ti_delta_t_1, t_bar_1, sigma_1, root_1]
+
     console.log(display_arr);
+    
 }
+
 function calculate_sum_val_tab2() {
     sum_c1_delta_t_2 = 0;
     sum_ci_ti_delta_t_2 = 0;
     sum_ci_ti_ti_delta_t_2 = 0;
-    for (let i = 0; i < obt_2_data.length; i++) {
+
+    for(let i=0; i<obt_2_data.length; i++) {
         sum_c1_delta_t_2 += obt_2_data[i][4];
         sum_ci_ti_delta_t_2 += obt_2_data[i][5];
         sum_ci_ti_ti_delta_t_2 += obt_2_data[i][8];
     }
     t_bar_2 = sum_ci_ti_delta_t_2 / sum_c1_delta_t_2;
-    sigma_2 = (sum_ci_ti_ti_delta_t_2 / sum_c1_delta_t_2) - (Math.pow(t_bar_2, 2));
-    c = sigma_2 / Math.pow(t_bar_2, 2);
+    sigma_2 = (sum_ci_ti_ti_delta_t_2 / sum_c1_delta_t_2) - (t_bar_2**2);
+    c = sigma_2 / t_bar_2**2;
     root_2 = newton_raphson(a, b, c);
-    let display_arr = [sum_c1_delta_t_2, sum_ci_ti_delta_t_2, sum_ci_ti_ti_delta_t_2, t_bar_2, sigma_2, root_2];
+
+    let display_arr = [sum_c1_delta_t_2,  sum_ci_ti_delta_t_2, sum_ci_ti_ti_delta_t_2, t_bar_2, sigma_2, root_2]
+
     console.log(display_arr);
 }
+
 function act5_verify_obtable_1() {
-    let val1 = document.getElementById("mt-1");
-    let val2 = document.getElementById("mt-2");
-    let val3 = document.getElementById("mt-3");
-    let val4 = document.getElementById("mt-4");
-    let val5 = document.getElementById("mt-5");
-    let val6 = document.getElementById("mt-6");
-    let val7 = document.getElementById("mt-7");
-    //  console.log(parseFloat(val1.value));
+    let val1: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-1");
+    let val2: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-2");
+    let val3: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-3");
+    let val4: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-4");
+    let val5: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-5");
+    let val6: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-6");
+    let val7: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-7");
+    
+   //  console.log(parseFloat(val1.value));
     console.log(parseFloat(val1.value), obt_1_data[0][2]);
     console.log(parseFloat(val2.value), obt_1_data[0][3]);
     console.log(parseFloat(val3.value), obt_1_data[0][4]);
@@ -180,112 +217,158 @@ function act5_verify_obtable_1() {
     console.log(parseFloat(val5.value), obt_1_data[0][6]);
     console.log(parseFloat(val6.value), obt_1_data[0][7]);
     console.log(parseFloat(val7.value), obt_1_data[0][8]);
+  
     // console.log(Q.value, To.value, Ti.value, ti.value, to.value);
     if (!verify_values(parseFloat(val1.value), obt_1_data[0][2])) {
-        alert("please correct the Ci value");
-        return;
+        
+      alert("please correct the Ci value");
+      return;
     }
-    if (!verify_values(parseFloat(val2.value), obt_1_data[0][3])) {
-        alert("please correct the delta ti value");
-        return;
+  
+   if (!verify_values(parseFloat(val2.value), obt_1_data[0][3])) {
+      alert("please correct the delta ti value");
+      return;
     }
-    if (!verify_values(parseFloat(val3.value), obt_1_data[0][4])) {
-        alert("please correct the Ci delta ti value");
-        return;
+  
+   if (!verify_values(parseFloat(val3.value), obt_1_data[0][4])) {
+      alert("please correct the Ci delta ti value");
+      return;
     }
-    if (!verify_values(parseFloat(val4.value), obt_1_data[0][5])) {
-        alert("please correct the Ci ti delta ti value");
-        return;
+  
+   if (!verify_values(parseFloat(val4.value), obt_1_data[0][5])) {
+      alert("please correct the Ci ti delta ti value");
+      return;
     }
-    if (!verify_values(parseFloat(val5.value), obt_1_data[0][6])) {
+
+   if (!verify_values(parseFloat(val5.value), obt_1_data[0][6])) {
         alert("please correct the E(t) value");
         return;
     }
-    if (!verify_values(parseFloat(val6.value), obt_1_data[0][7])) {
-        alert("please correct the ELFR value");
-        return;
+
+   if (!verify_values(parseFloat(val6.value), obt_1_data[0][7])) {
+    alert("please correct the ELFR value");
+    return;
     }
-    if (!verify_values(parseFloat(val7.value), obt_1_data[0][8])) {
-        alert("please correct the Ci ti^2 delta ti value");
-        return;
+
+   if (!verify_values(parseFloat(val7.value), obt_1_data[0][8])) {
+    alert("please correct the Ci ti^2 delta ti value");
+    return;
     }
+  
     // pp.addtorightpannel(act5_ob_btn, 3);
+
     alert("all values are correct");
+
     // complete_main_table_1();
+  
     // var bsOffcanvas = new bootstrap.Offcanvas(
     //   document.getElementById("offcanvasRight3")
     // );
     // bsOffcanvas.show();
+
     first_row_verified = true;
-}
-function act5_verify_obtable_11() {
-    let val1 = document.getElementById("mt-11");
-    let val2 = document.getElementById("mt-12");
-    let val3 = document.getElementById("mt-13");
-    let val4 = document.getElementById("mt-14");
-    let val5 = document.getElementById("mt-15");
-    let val6 = document.getElementById("mt-16");
-    let val7 = document.getElementById("mt-17");
-    //  console.log(parseFloat(val1.value));
-    console.log(parseFloat(val1.value), obt_1_data[1][2]);
-    console.log(parseFloat(val2.value), obt_1_data[1][3]);
-    console.log(parseFloat(val3.value), obt_1_data[1][4]);
-    console.log(parseFloat(val4.value), obt_1_data[1][5]);
-    console.log(parseFloat(val5.value), obt_1_data[1][6]);
-    console.log(parseFloat(val6.value), obt_1_data[1][7]);
-    console.log(parseFloat(val7.value), obt_1_data[1][8]);
+
+  }
+
+  function act5_verify_obtable_11() {
+    let val1: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-11");
+    let val2: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-12");
+    let val3: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-13");
+    let val4: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-14");
+    let val5: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-15");
+    let val6: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-16");
+    let val7: HTMLInputElement = <HTMLInputElement>document.getElementById("mt-17");
+    
+   //  console.log(parseFloat(val1.value));
+   console.log(parseFloat(val1.value), obt_1_data[1][2]);
+   console.log(parseFloat(val2.value), obt_1_data[1][3]);
+   console.log(parseFloat(val3.value), obt_1_data[1][4]);
+   console.log(parseFloat(val4.value), obt_1_data[1][5]);
+   console.log(parseFloat(val5.value), obt_1_data[1][6]);
+   console.log(parseFloat(val6.value), obt_1_data[1][7]);
+   console.log(parseFloat(val7.value), obt_1_data[1][8]);
+  
     // console.log(Q.value, To.value, Ti.value, ti.value, to.value);
     if (!verify_values(parseFloat(val1.value), obt_1_data[1][2])) {
-        alert("please correct the Ci value");
-        return;
+        
+      alert("please correct the Ci value");
+      return;
     }
-    if (!verify_values(parseFloat(val2.value), obt_1_data[1][3])) {
-        alert("please correct the delta ti value");
-        return;
+  
+     if (!verify_values(parseFloat(val2.value), obt_1_data[1][3])) {
+      alert("please correct the delta ti value");
+      return;
     }
-    if (!verify_values(parseFloat(val3.value), obt_1_data[1][4])) {
-        alert("please correct the Ci delta ti value");
-        return;
+  
+     if (!verify_values(parseFloat(val3.value), obt_1_data[1][4])) {
+      alert("please correct the Ci delta ti value");
+      return;
     }
-    if (!verify_values(parseFloat(val4.value), obt_1_data[1][5])) {
-        alert("please correct the Ci ti delta ti value");
-        return;
+  
+     if (!verify_values(parseFloat(val4.value), obt_1_data[1][5])) {
+      alert("please correct the Ci ti delta ti value");
+      return;
     }
-    if (!verify_values(parseFloat(val5.value), obt_1_data[1][6])) {
+
+     if (!verify_values(parseFloat(val5.value), obt_1_data[1][6])) {
         alert("please correct the E(t) value");
         return;
     }
-    if (!verify_values(parseFloat(val6.value), obt_1_data[1][7])) {
-        alert("please correct the ELFR value");
-        return;
+
+     if (!verify_values(parseFloat(val6.value), obt_1_data[1][7])) {
+    alert("please correct the ELFR value");
+    return;
     }
-    if (!verify_values(parseFloat(val7.value), obt_1_data[1][8])) {
-        alert("please correct the Ci ti^2 delta ti value");
-        return;
+
+     if (!verify_values(parseFloat(val7.value), obt_1_data[1][8])) {
+    alert("please correct the Ci ti^2 delta ti value");
+    return;
     }
+  
     // pp.addtorightpannel(act5_ob_btn, 3);
+
     alert("all values are correct");
-    if (first_row_verified) {
-        complete_main_table_1();
-        var bsOffcanvas = new bootstrap.Offcanvas(document.getElementById("offcanvasRight3"));
-        bsOffcanvas.show();
+
+    if(first_row_verified) {
+      complete_main_table_1();
+  
+      var bsOffcanvas = new bootstrap.Offcanvas(
+        document.getElementById("offcanvasRight3")
+      );
+      bsOffcanvas.show();
+    } else {
+      alert('You need to verify first row also!!');
+      return;
     }
-    else {
-        alert('You need to verify first row also!!');
-        return;
-    }
-}
-function complete_main_table_1() {
+
+
+
+  }
+
+
+  function complete_main_table_1() {
+
     document.getElementById('hide_panel3').click();
+
     pp.clearleftpannel();
+
     pp.addtoleftpannel(main_table);
+
     let tb = document.getElementById('table-5-body');
-    tb.innerHTML = ``;
+
+    tb.innerHTML= ``;
+
+
     document.getElementById('a5-temp').remove();
-    for (let i = 0; i < obt_1_data.length; i++) {
+      
+    for(let i=0; i<obt_1_data.length; i++) {
+
         let row = document.createElement('tr');
+
+
+
         row.innerHTML = `
-        <td>${i + 1}</td>
+        <td>${i+1}</td>
         <td>${obt_1_data[i][0]}</td>
         <td>${obt_1_data[i][1].toFixed(2)}</td>
         <td>${obt_1_data[i][2].toFixed(2)}</td>
@@ -296,10 +379,17 @@ function complete_main_table_1() {
         <td>${(obt_1_data[i][7].toFixed(6))}</td>
         <td>${(obt_1_data[i][8]).toFixed(2)}</td>
         `;
+
+
         tb.append(row);
+
+
     }
+
     console.log('table loaded sccessfully!');
-    let all_properties = `
+
+
+    let  all_properties = `
 
 <div style="overflow-y: auto !important; max-height: 80%;">
 <table class="table" style="height: 30% !important;">
@@ -368,41 +458,63 @@ function complete_main_table_1() {
 
 
 `;
-    pp.showdescription(all_properties, 3);
-    pp.addtorightpannel(verify_summations_btn, 3);
+
+pp.showdescription(all_properties, 3);
+
+
+pp.addtorightpannel(verify_summations_btn, 3);
+ 
     // document.getElementById('panel1_btn').remove();
+
     // pp.addtorightpannel(act5_plot_btn, 3);
-}
-function verify_summations() {
+
+  }
+
+  function verify_summations() {
     // let val1: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp1");
     // let val2: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp2");
     // let val3: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp3");
-    let val4 = document.getElementById("act4-tab3-inp4");
-    let val5 = document.getElementById("act4-tab3-inp5");
-    let val6 = document.getElementById("act4-tab3-inp6");
+    let val4: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp4");
+    let val5: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp5");
+    let val6: HTMLInputElement = <HTMLInputElement>document.getElementById("act4-tab3-inp6");
+    
     // console.log(parseFloat(val1.value));
+  
     // console.log(Q.value, To.value, Ti.value, ti.value, to.value);
     console.log(`Mean Residence value ${t_bar_1}`);
     console.log(`Varience value ${sigma_1}`);
     console.log(`dispersion value value ${root_1}`);
+
+  
     if (!verify_values(parseFloat(val4.value), t_bar_1)) {
-        alert("please correct the Mean Residence value");
-        return;
+      alert("please correct the Mean Residence value");
+      return;
     }
+
     if (!verify_values(parseFloat(val5.value), sigma_1)) {
-        alert("please correct the Varience value");
-        return;
-    }
+      alert("please correct the Varience value");
+      return;
+   }
+
     if (!verify_values(parseFloat(val6.value), root_1)) {
-        alert("please correct the dispersion value value");
-        return;
+    alert("please correct the dispersion value value");
+    return;
     }
+  
+  
     // pp.addtorightpannel(act5_ob_btn, 3);
+
     document.getElementById('panel1_btn').remove();
+
+    
+
     // var bsOffcanvas = new bootstrap.Offcanvas(
     //   document.getElementById("offcanvasRight3")
     // );
     // bsOffcanvas.show();
+
     complete_main_table_2();
-}
-//# sourceMappingURL=activity4.js.map
+
+  }
+
+
